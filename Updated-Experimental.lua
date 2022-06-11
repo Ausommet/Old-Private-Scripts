@@ -261,7 +261,20 @@ local Select = Main.Dropdown({
         end,
     }) 
 --//Misc
-
+Misc.Toggle({
+    Text = "Material Auto-Farm",
+    Callback = function(value)
+        if value then 
+        for i, v in pairs(workspace.Materials:GetChildren()) do
+            pcall(function()game.ReplicatedStorage.ClaimMaterial:InvokeServer(v.Id.Value)end)
+        end
+    end
+end,
+Menu = {
+    Info = function(self)
+        UI.Banner({
+            Text = "You wont be able to move while it is on, might also have to wait a bit until you can move again sorry"})end}
+})
 -- Staff Detection // Re-join On kick
     Players.PlayerAdded:Connect(function(Plr)
         if Plr:GetRankInGroup(5683480) > 1 or Plr:GetRankInGroup(7171494) > 0 or Plr:GetRankInGroup(5928691) > 0 or Plr:GetRankInGroup(5754032) > 5 then 
@@ -314,7 +327,11 @@ end)
         Text = "God-Mode Respawn",
         Callback = function()
             game.workspace.GameLoader.CharLoadEvent:FireServer()
-        end
+        end,
+        Menu = {
+            Info = function(self)
+                UI.Banner({
+                    Text = "This respawns your entire character, only needed if your character falls to pieces(when using god-mode) "})end}
     })
 --Stat-Changer 
     stat_changer.Dropdown({
@@ -330,6 +347,10 @@ end)
         Callback = function(value)
             b = value
         end,
+        Menu = {
+            Info = function(self)
+                UI.Banner({
+                    Text = "Set to negative to gain points, if you want god-mode set Vitality to -20000 (after level 200+ you will have to reduce it even more)"})end}
     })
 
     stat_changer.Button({
