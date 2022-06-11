@@ -275,27 +275,33 @@ Menu = {
         UI.Banner({
             Text = "You wont be able to move while it is on, might also have to wait a bit until you can move again sorry"})end}
 })
--- Staff Detection // Re-join On kick
-    Players.PlayerAdded:Connect(function(Plr)
-        if Plr:GetRankInGroup(5683480) > 1 or Plr:GetRankInGroup(7171494) > 0 or Plr:GetRankInGroup(5928691) > 0 or Plr:GetRankInGroup(5754032) > 5 then 
-                        Teleport()
+--respawn where died
+local staff =  Misc.Toggle({
+    Text= 'Respawn Same Place',
+    Callback = function(Value)
+        while Value do
+            wait(1)
+            repeat wait() until Plr.Character
+            local function Main()
+            local Humanoid = Player.Character:WaitForChild("Humanoid")
+            local ripfunction = false
+            Humanoid.Died:Connect(function()
+                local DeathLocation = Player.Character:WaitForChild("HumanoidRootPart").CFrame
+                workspace.ChildAdded:Connect(function(Object)
+                    if not ripfunction and Object.Name == Player.Name then
+                        wait()
+                        Player.Character:WaitForChild("HumanoidRootPart").CFrame = DeathLocation
+                        ripfunction = true
+                        Main()
                     end
                 end)
-
-   local staff =  Misc.Toggle({
-        Text= 'Staff Detection',
-        Callback = function(Value)
-            if Value then 
-                for Index, Value in next, Players:GetPlayers() do 
-                    if Value ~= Player and Value:GetRankInGroup(5683480) > 1 or Value:GetRankInGroup(7171494) > 0 or Value:GetRankInGroup(5928691) > 0 or Value:GetRankInGroup(5754032) > 5 then
-                            Teleport()
-                            end
-                        end
-                    end
-            end,
-            Value = true
-        })
-staff:SetState(true)
+            end)
+        end
+        Main()
+            end
+        end,
+        Value = true
+    })
 --Invisibility
     Misc.Button({
         Text = 'Invisibility',
@@ -323,6 +329,7 @@ end)
                     Text = "Only detected by spectate tools. Moreover mobs dont spawn when using this (they fall when spawned)"})end}
     })
 
+    --God-Mode Respawn
     Misc.Button({
         Text = "God-Mode Respawn",
         Callback = function()
@@ -333,6 +340,27 @@ end)
                 UI.Banner({
                     Text = "This respawns your entire character, only needed if your character falls to pieces(when using god-mode) "})end}
     })
+    -- Staff Detection // Re-join On kick
+    Players.PlayerAdded:Connect(function(Plr)
+        if Plr:GetRankInGroup(5683480) > 1 or Plr:GetRankInGroup(7171494) > 0 or Plr:GetRankInGroup(5928691) > 0 or Plr:GetRankInGroup(5754032) > 5 then 
+                        Teleport()
+                    end
+                end)
+
+   local staff =  Misc.Toggle({
+        Text= 'Staff Detection',
+        Callback = function(Value)
+            if Value then 
+                for Index, Value in next, Players:GetPlayers() do 
+                    if Value ~= Player and Value:GetRankInGroup(5683480) > 1 or Value:GetRankInGroup(7171494) > 0 or Value:GetRankInGroup(5928691) > 0 or Value:GetRankInGroup(5754032) > 5 then
+                            Teleport()
+                            end
+                        end
+                    end
+            end,
+            Value = true
+        })
+staff:SetState(true)
 --Stat-Changer 
     stat_changer.Dropdown({
         Text = "Select Stat to change",
