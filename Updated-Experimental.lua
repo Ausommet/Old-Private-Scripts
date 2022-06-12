@@ -2,45 +2,44 @@ repeat wait() until game:IsLoaded()
 local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
 --Ui
 local UI = Material.Load({
-    Title = "「SBO:R Experimental」 | By Ausommet",
+    Title = "「SBO:R Killer」 | By Ausommet",
     Style = 3,
     SizeX = 300,
-    SizeY = 227,
-    Theme = "Jester",
+    SizeY = 260,
+    Theme = "Dark",
     ColorOverrides = {
-        MainFrame = Color3.fromRGB(9,49,69),
-		Minimise = Color3.fromRGB(255,106,0),
-		MinimiseAccent = Color3.fromRGB(147,59,0),
-		Maximise = Color3.fromRGB(25,255,0),
-		MaximiseAccent = Color3.fromRGB(0,255,110),
-		NavBar = Color3.fromRGB(60,100,120),
-		NavBarAccent = Color3.fromRGB(9,49,69),
+        MainFrame = Color3.fromRGB(200,162,200),
+		Minimise = Color3.fromRGB(0,255,0),
+		MinimiseAccent = Color3.fromRGB(255,255,255),
+		Maximise = Color3.fromRGB(255,0,0),
+		MaximiseAccent = Color3.fromRGB(255,255,255),
+		NavBar = Color3.fromRGB(255,255,255),
+		NavBarAccent = Color3.fromRGB(255,0,150),
 		NavBarInvert = Color3.fromRGB(255,255,255),
-		TitleBar = Color3.fromRGB(60,100,120),
+		TitleBar = Color3.fromRGB(255,0,150),
 		TitleBarAccent = Color3.fromRGB(255,255,255),
 		Overlay = Color3.fromRGB(255,255,255),
-		Banner = Color3.fromRGB(9,49,69),
+		Banner = Color3.fromRGB(255,0,150),
 		BannerAccent = Color3.fromRGB(255,255,255),
 		Content = Color3.fromRGB(255,255,255),
-		Button = Color3.fromRGB(9,49,69), 
+		Button = Color3.fromRGB(255,0,150), 
 		ButtonAccent = Color3.fromRGB(255,255,255),
 		ChipSet = Color3.fromRGB(255,255,255),
 		ChipSetAccent = Color3.fromRGB(9,49,69),
-		DataTable = Color3.fromRGB(255,255,255),
-		DataTableAccent = Color3.fromRGB(9,49,69),
-		Slider = Color3.fromRGB(9,49,69),   
+		DataTable = Color3.fromRGB(255,0,150),
+		DataTableAccent = Color3.fromRGB(255,255,255),
+		Slider = Color3.fromRGB(255,0,150),
 		SliderAccent = Color3.fromRGB(255,255,255),
-		Toggle = Color3.fromRGB(255,255,255),
-		ToggleAccent = Color3.fromRGB(9,49,69),
-		Dropdown = Color3.fromRGB(9,49,69),
+		Toggle = Color3.fromRGB(255,0,150),
+		ToggleAccent = Color3.fromRGB(255,255,255),
+		Dropdown = Color3.fromRGB(255,0,150),
 		DropdownAccent = Color3.fromRGB(255,255,255),
-		ColorPicker = Color3.fromRGB(9,49,69),
-		ColorPickerAccent = Color3.fromRGB(255,255,255),
-		TextField = Color3.fromRGB(255,255,255),
+		ColorPicker = Color3.fromRGB(0,0,0),
+		ColorPickerAccent = Color3.fromRGB(0,0,0),
+		TextField = Color3.fromRGB(255,0,150),
 		TextFieldAccent = Color3.fromRGB(255,255,255),
     }
 })
-
 --Pages
 local Main = UI.New({
     Title = "Main"
@@ -69,6 +68,7 @@ local foundAnything = ""
 local actualHour = os.date("!*t").hour
 local Deleted = false
 local Mobs = {}
+local WEPAnimations = {}
 --Server Hop Section
 local File = pcall(function()
     AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json"))
@@ -144,15 +144,35 @@ Main.Toggle({
         killaura = false
       end
       while killaura do
+        if Swing then
+            wait()
+          else
+            Wait(1/ atkspeed)
         for Index, Value in next, workspace.Mobs:GetChildren() do
             if workspace.Mobs:FindFirstChild(Value.Name) and workspace.Mobs[Value.Name]:FindFirstChild('Head') then
               if (Value['Head'].Position - workspace[Client]['Head'].Position).magnitude < 50  then 
                 game:GetService("ReplicatedStorage").ChangeWeld:FireServer("One-Handed Held", "RightLowerArm")
                 game:GetService("ReplicatedStorage").DamageMob:FireServer(workspace.Mobs[Value.Name].Humanoid, false, workspace[Client].Sword.Middle)
+                if Swing then 
+                    local W3P = Players.LocalPlayer.PlayerGui.GameGui.MenuGui.InfoImage.WeaponType
+                    local CW = (W3P.Text:gsub('Active Weapon: ', ''))
+                     table.clear(WEPAnimations)
+                    for _,v in pairs(Players.LocalPlayer.PlayerGui.CLIENT.SwordSlashes[CW]:GetChildren()) do
+                     table.insert(WEPAnimations, v)
+                    end
+                    local AnID = Players.LocalPlayer.PlayerGui.CLIENT.SwordSlashes[CW][tostring(WEPAnimations[math.random(#WEPAnimations)])].AnimationId
+                    local Anim = Instance.new("Animation")
+                    Anim.AnimationId = AnID
+                    local k = game.Players[Client].Character.Humanoid:LoadAnimation(Anim)
+                 k:Play()
+                 k:AdjustSpeed(atkspeed)
+                 wait(k.Length)
+                k:Stop()
+                    end
+                end
               end
           end
       end
-      Wait(1 / atkspeed)  
   end
     end,
     killaura = false
@@ -260,6 +280,32 @@ local Select = Main.Dropdown({
             Select:SetOptions(Mobs)
         end,
     }) 
+--Stat-Changer 
+stat_changer.Dropdown({
+    Text = "Select Stat to change",
+    Callback = function(value)
+        a = value
+    end,
+    Options = {"Vitality", "Strength", "Agility", "Defense", "Luck"}
+})
+
+stat_changer.TextField({
+    Text = "Set Value",
+    Callback = function(value)
+        b = value
+    end,
+    Menu = {
+        Info = function(self)
+            UI.Banner({
+                Text = "Set to negative to gain points, if you want god-mode set Vitality to -20000 (after level 200+ you will have to reduce it even more)"})end}
+})
+
+stat_changer.Button({
+    Text = "Change Stat",
+    Callback = function()
+        print(game:GetService("ReplicatedStorage").StatsEvent:FireServer(a, tonumber(b)))
+    end
+})
 --//Misc
 Misc.Toggle({
     Text = "Material Auto-Farm",
@@ -273,7 +319,7 @@ end,
 Menu = {
     Info = function(self)
         UI.Banner({
-            Text = "You wont be able to move while it is on, might also have to wait a bit until you can move again sorry"})end}
+            Text = "You wont be able to move while it is on, might also have to wait a bit until you can move again"})end}
 })
 --respawn where died
 local staff =  Misc.Toggle({
@@ -301,6 +347,18 @@ local staff =  Misc.Toggle({
             end
         end,
         Value = true
+    })
+        --Animation Requests ??? idk bro
+Misc.Toggle({
+    Text= 'Legit Kill-Aura',
+    Callback = function(Value)
+        if Value then
+            Swing = true
+        else
+            Swing = false
+        end
+end,
+        Value = false
     })
 --Invisibility
     Misc.Button({
@@ -340,6 +398,7 @@ end)
                 UI.Banner({
                     Text = "This respawns your entire character, only needed if your character falls to pieces(when using god-mode) "})end}
     })
+
     -- Staff Detection // Re-join On kick
     Players.PlayerAdded:Connect(function(Plr)
         if Plr:GetRankInGroup(5683480) > 1 or Plr:GetRankInGroup(7171494) > 0 or Plr:GetRankInGroup(5928691) > 0 or Plr:GetRankInGroup(5754032) > 5 then 
@@ -350,40 +409,20 @@ end)
    local staff =  Misc.Toggle({
         Text= 'Staff Detection',
         Callback = function(Value)
-            if Value then 
+            if Value == true then
+                SD = true
+            else
+            SD = false
+            end
+            while SD do
+                wait()
                 for Index, Value in next, Players:GetPlayers() do 
                     if Value ~= Player and Value:GetRankInGroup(5683480) > 1 or Value:GetRankInGroup(7171494) > 0 or Value:GetRankInGroup(5928691) > 0 or Value:GetRankInGroup(5754032) > 5 then
                             Teleport()
-                            end
                         end
                     end
+                end
             end,
             Value = true
         })
 staff:SetState(true)
---Stat-Changer 
-    stat_changer.Dropdown({
-        Text = "Select Stat to change",
-        Callback = function(value)
-            a = value
-        end,
-        Options = {"Vitality", "Strength", "Agility", "Defense", "Luck"}
-    })
-    
-    stat_changer.TextField({
-        Text = "Set Value",
-        Callback = function(value)
-            b = value
-        end,
-        Menu = {
-            Info = function(self)
-                UI.Banner({
-                    Text = "Set to negative to gain points, if you want god-mode set Vitality to -20000 (after level 200+ you will have to reduce it even more)"})end}
-    })
-
-    stat_changer.Button({
-        Text = "Change Stat",
-        Callback = function()
-            print(game:GetService("ReplicatedStorage").StatsEvent:FireServer(a, tonumber(b)))
-        end
-    })
