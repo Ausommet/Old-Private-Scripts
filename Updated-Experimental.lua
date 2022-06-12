@@ -144,10 +144,6 @@ Main.Toggle({
         killaura = false
       end
       while killaura do
-        if Swing then
-            wait()
-          else
-            Wait(1/ atkspeed)
         for Index, Value in next, workspace.Mobs:GetChildren() do
             if workspace.Mobs:FindFirstChild(Value.Name) and workspace.Mobs[Value.Name]:FindFirstChild('Head') then
               if (Value['Head'].Position - workspace[Client]['Head'].Position).magnitude < 50  then 
@@ -166,13 +162,13 @@ Main.Toggle({
                     local k = game.Players[Client].Character.Humanoid:LoadAnimation(Anim)
                  k:Play()
                  k:AdjustSpeed(atkspeed)
-                 wait(k.Length)
+                 wait(1 / atkspeed)
                 k:Stop()
-                    end
                 end
               end
           end
       end
+        Wait(1/ atkspeed)
   end
     end,
     killaura = false
